@@ -1,0 +1,25 @@
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# .NET
+**/bin/
+**/obj/
+
+# Angular
+**/node_modules/
+**/dist/
+
+# Logs
+*.log
+
+# Environment
+.env
+
+# Publish
+publish/
+
+# OS files
+Thumbs.db
+.DS_Store
