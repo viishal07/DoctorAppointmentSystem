@@ -103,14 +103,35 @@ export class DepartmentsComponent implements OnInit {
 
   resetForm(): void { this.editingId.set(null); this.form.reset(); }
 
-  onSubmit(): void {
-    if (this.form.invalid) return;
-    const body = this.form.value as any;
-    const action = this.editingId()
-      ? this.deptService.update(this.editingId()!, body)
-      : this.deptService.create(body);
-    action.subscribe({
-      next: () => { this.snack.open('Saved', 'OK', { duration: 3000 }); this.resetForm(); this.load(); }
-    });
-  }
+    onSubmit(): void {
+        if (this.form.invalid) return;
+
+        const body = this.form.value as any;
+
+        if (this.editingId()) {
+
+            this.deptService
+                .update(this.editingId()!, body)
+                .subscribe({
+                    next: () => {
+                        this.snack.open('Updated', 'OK', { duration: 3000 });
+                        this.resetForm();
+                        this.load();
+                    }
+                });
+
+        } else {
+
+            this.deptService
+                .create(body)
+                .subscribe({
+                    next: () => {
+                        this.snack.open('Created', 'OK', { duration: 3000 });
+                        this.resetForm();
+                        this.load();
+                    }
+                });
+
+        }
+    }
 }

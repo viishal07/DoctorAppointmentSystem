@@ -9,7 +9,7 @@ public class Patient : BaseEntity
     // InsuranceId is optional — a patient may or may not have insurance
     public Guid? InsuranceId { get; set; }
 
-    public DateTime? DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
     public string BloodGroup { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
 

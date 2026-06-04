@@ -56,10 +56,12 @@ public class AuthService : IAuthService
 
         var patient = new Patient
         {
-            AppUserId   = user.Id,
-            DateOfBirth = dto.DateOfBirth,
-            BloodGroup  = dto.BloodGroup,
-            Address     = dto.Address
+            AppUserId = user.Id,
+            DateOfBirth = dto.DateOfBirth.HasValue
+    ? DateOnly.FromDateTime(dto.DateOfBirth.Value)
+    : null,
+            BloodGroup = dto.BloodGroup,
+            Address = dto.Address
         };
 
         await _patientRepository.AddAsync(patient);

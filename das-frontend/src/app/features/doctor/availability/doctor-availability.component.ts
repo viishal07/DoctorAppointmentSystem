@@ -87,61 +87,109 @@ import { TimeFormatPipe } from '../../../shared/pipes/time-format.pipe';
   `]
 })
 export class DoctorAvailabilityComponent implements OnInit {
-  private availService = inject(AvailabilityService);
-  private doctorService = inject(DoctorService);
-  private fb = inject(FormBuilder);
-  private snack = inject(MatSnackBar);
+    private availService = inject(AvailabilityService);
+    private doctorService = inject(DoctorService);
+    private fb = inject(FormBuilder);
+    private snack = inject(MatSnackBar);
 
-  days = AVAILABILITY_DAYS;
-  slots = signal<AvailabilityResponse[]>([]);
-  editingDay = signal<AvailabilityDay | null>(null);
-  saving = false;
-  doctorId = '';
+    days = AVAILABILITY_DAYS;
+    slots = signal<AvailabilityResponse[]>([]);
+    editingDay = signal<AvailabilityDay | null>(null);
+    saving = false;
+    doctorId = '';
 
-  form = this.fb.group({
-    startTime: ['09:00', Validators.required],
-    endTime: ['17:00', Validators.required],
-    isAvailable: [true]
-  });
+    private dayMap: Record<string, number> = {
+        Sunday: 0,
+        Monday: 1,
+        Tuesday: 2,
+        Wednesday: 3,
+        Thursday: 4,
+        Friday: 5,
+        Saturday: 6
+    };
 
-  ngOnInit(): void {
-    this.doctorService.getProfile().subscribe(p => {
-      this.doctorId = p.id;
-      this.availService.getByDoctor(p.id).subscribe(s => this.slots.set(s));
+    form = this.fb.group({
+        startTime: ['09:00', Validators.required],
+        endTime: ['17:00', Validators.required],
+        isAvailable: [true]
     });
-  }
 
-  getSlot(day: AvailabilityDay): AvailabilityResponse | undefined {
-    return this.slots().find(s => s.dayOfWeek === day);
-  }
+    ngOnInit(): void {
+        this.doctorService.getProfile().subscribe({
+            next: (p) => {
+                this.doctorId = p.id;
 
-  openEdit(day: AvailabilityDay): void {
-    this.editingDay.set(day);
-    const existing = this.getSlot(day);
-    this.form.patchValue({
-      startTime: existing?.startTime?.substring(0, 5) ?? '09:00',
-      endTime: existing?.endTime?.substring(0, 5) ?? '17:00',
-      isAvailable: existing?.isAvailable ?? true
-    });
-  }
+                this.availService.getByDoctor(p.id).subscribe({
+                    next: (s) => this.slots.set(s),
+                    error: (err) => console.error('LOAD AVAILABILITY ERROR', err)
+                });
+            },
+            error: (err) => console.error('PROFILE ERROR', err)
+        });
+    }
 
-  onSave(): void {
-    if (this.form.invalid || !this.editingDay()) return;
-    this.saving = true;
-    const v = this.form.value;
-    this.availService.set({
-      dayOfWeek: this.editingDay()!,
-      startTime: v.startTime! + ':00',
-      endTime: v.endTime! + ':00',
-      isAvailable: v.isAvailable ?? true
-    }).subscribe({
-      next: (msg) => {
-        this.snack.open(msg, 'OK', { duration: 3000 });
-        this.saving = false;
-        this.editingDay.set(null);
-        this.availService.getByDoctor(this.doctorId).subscribe(s => this.slots.set(s));
-      },
-      error: () => { this.saving = false; }
-    });
-  }
+    getSlot(day: AvailabilityDay): AvailabilityResponse | undefined {
+        return this.slots().find(s => s.dayOfWeek === day);
+    }
+
+    openEdit(day: AvailabilityDay): void {
+        this.editingDay.set(day);
+
+        const existing = this.getSlot(day);
+
+        this.form.patchValue({
+            startTime: existing?.startTime?.substring(0, 5) ?? '09:00',
+            endTime: existing?.endTime?.substring(0, 5) ?? '17:00',
+            isAvailable: existing?.isAvailable ?? true
+        });
+    }
+
+    onSave(): void {
+        if (this.form.invalid || !this.editingDay()) {
+            return;
+        }
+
+        this.saving = true;
+
+        const v = this.form.value;
+
+        const payload = {
+            dayOfWeek: Number(this.dayMap[this.editingDay()!]),
+            startTime: `${v.startTime}:00`,
+            endTime: `${v.endTime}:00`,
+            isAvailable: v.isAvailable ?? true
+        };
+
+        console.log('AVAILABILITY PAYLOAD', payload);
+
+        this.availService.set(payload as any).subscribe({
+            next: (msg) => {
+                this.snack.open(msg, 'OK', {
+                    duration: 3000
+                });
+
+                this.editingDay.set(null);
+
+                this.availService.getByDoctor(this.doctorId).subscribe({
+                    next: (s) => this.slots.set(s)
+                });
+
+                this.saving = false;
+            },
+
+            error: (err) => {
+                console.error('SAVE AVAILABILITY ERROR', err);
+
+                this.snack.open(
+                    err?.error?.title ||
+                    err?.error?.message ||
+                    'Failed to save availability',
+                    'Close',
+                    { duration: 5000 }
+                );
+
+                this.saving = false;
+            }
+        });
+    }
 }

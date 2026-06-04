@@ -85,11 +85,25 @@ export class LoginComponent {
 
   onSubmit(): void {
     if (this.form.invalid) return;
-    this.loading = true;
-    this.authService.login(this.form.value as any).subscribe({
-      next: (res) => { this.authStore.login(res); },
-      error: () => { this.loading = false; },
-      complete: () => { this.loading = false; }
-    });
+      this.loading = true;
+
+      this.authService.login(this.form.value as any).subscribe({
+          next: (res) => {
+              console.log('LOGIN RESPONSE:', res);
+              this.authStore.login(res);
+          },
+          error: (err) => {
+              console.error('LOGIN ERROR:', err);
+              this.loading = false;
+          },
+          complete: () => {
+              this.loading = false;
+          }
+      });
+    //this.authService.login(this.form.value as any).subscribe({
+    //  next: (res) => { this.authStore.login(res); },
+    //  error: () => { this.loading = false; },
+    //  complete: () => { this.loading = false; }
+    //});
   }
 }
