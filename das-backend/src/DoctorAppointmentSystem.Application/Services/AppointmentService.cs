@@ -43,22 +43,25 @@ public class AppointmentService : IAppointmentService
         if (!doctor.IsApproved)
             throw new InvalidOperationException("Cannot book an appointment with an unapproved doctor.");
 
-        var requestedDay = (AvailabilityDay)dto.ScheduledAt.DayOfWeek;
+        var scheduledAtLocal = ToLocalClinicTime(dto.ScheduledAt);
+        var scheduledAtUtc = ToUtcInstant(dto.ScheduledAt);
+
+        var requestedDay = (AvailabilityDay)scheduledAtLocal.DayOfWeek;
         var availability = await _availabilityRepository.GetByDoctorIdAndDayAsync(doctor.Id, requestedDay);
-        var requestedTime = TimeOnly.FromDateTime(dto.ScheduledAt);
+        var requestedTime = TimeOnly.FromDateTime(scheduledAtLocal);
 
         if (availability is null || !availability.IsAvailable ||
             requestedTime < availability.StartTime || requestedTime >= availability.EndTime)
             throw new InvalidOperationException("Selected time is outside doctor availability.");
 
-        if (await _appointmentRepository.HasActiveSlotAsync(doctor.Id, dto.ScheduledAt))
+        if (await _appointmentRepository.HasActiveSlotAsync(doctor.Id, scheduledAtUtc))
             throw new InvalidOperationException("This appointment slot is already booked.");
 
         var appointment = new Appointment
         {
             DoctorId = doctor.Id,
             PatientId = patient.Id,
-            ScheduledAt = dto.ScheduledAt,
+            ScheduledAt = scheduledAtUtc,
             Reason = dto.Reason,
             Status = AppointmentStatus.Pending
         };
@@ -69,7 +72,7 @@ public class AppointmentService : IAppointmentService
             patient.AppUser.Email!,
             patient.AppUser.FullName,
             doctor.AppUser.FullName,
-            dto.ScheduledAt);
+            scheduledAtLocal);
 
         var created = await _appointmentRepository.GetByIdAsync(appointment.Id)
             ?? throw new InvalidOperationException("Appointment could not be retrieved after creation.");
@@ -175,5 +178,38 @@ public class AppointmentService : IAppointmentService
         appointment.UpdatedAt = DateTime.UtcNow;
 
         await _appointmentRepository.UpdateAsync(appointment);
+    }
+
+    private static DateTime ToLocalClinicTime(DateTime scheduledAt)
+    {
+        if (scheduledAt.Kind == DateTimeKind.Utc)
+            return TimeZoneInfo.ConvertTimeFromUtc(scheduledAt, GetClinicTimeZone());
+
+        return DateTime.SpecifyKind(scheduledAt, DateTimeKind.Unspecified);
+    }
+
+    private static DateTime ToUtcInstant(DateTime scheduledAt)
+    {
+        if (scheduledAt.Kind == DateTimeKind.Utc)
+            return scheduledAt;
+
+        var local = DateTime.SpecifyKind(scheduledAt, DateTimeKind.Unspecified);
+        return TimeZoneInfo.ConvertTimeToUtc(local, GetClinicTimeZone());
+    }
+
+    private static TimeZoneInfo GetClinicTimeZone()
+    {
+        try
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
+        }
+        catch (TimeZoneNotFoundException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+        }
+        catch (InvalidTimeZoneException)
+        {
+            return TimeZoneInfo.FindSystemTimeZoneById("Asia/Kolkata");
+        }
     }
 }

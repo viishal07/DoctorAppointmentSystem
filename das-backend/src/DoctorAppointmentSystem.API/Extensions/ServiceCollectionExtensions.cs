@@ -14,15 +14,15 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection services)
     {
-        // ── AutoMapper ──────────────────────────────────────────────────────
+        //  AutoMapper
         services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
-        // ── FluentValidation ────────────────────────────────────────────────
+        //  FluentValidation 
         // Register all validators from the Application assembly
         services.AddFluentValidationAutoValidation();
         services.AddValidatorsFromAssemblyContaining<RegisterPatientValidator>();
 
-        // ── Application Services ────────────────────────────────────────────
+        //  Application Services 
         services.AddScoped<IDoctorService,       DoctorService>();
         services.AddScoped<IPatientService,      PatientService>();
         services.AddScoped<IAppointmentService,  AppointmentService>();

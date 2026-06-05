@@ -19,7 +19,7 @@ export const appRoutes: Routes = [
   },
   {
     path: 'unauthorized',
-    loadComponent: () => import('./features/auth/login/login.component').then(m => m.LoginComponent)
+    loadComponent: () => import('./features/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent)
   },
   { path: '', redirectTo: '/auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: '/auth/login' }

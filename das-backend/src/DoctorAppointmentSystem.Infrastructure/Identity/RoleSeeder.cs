@@ -14,7 +14,7 @@ public static class RoleSeeder
         IConfiguration configuration,
         ILogger logger)
     {
-        // ── Seed roles ──────────────────────────────────────────────────────
+        //  Seed roles 
         string[] roles = [nameof(UserRole.Admin), nameof(UserRole.Doctor), nameof(UserRole.Patient)];
 
         foreach (var role in roles)
@@ -26,7 +26,7 @@ public static class RoleSeeder
             }
         }
 
-        // ── Seed default admin user ─────────────────────────────────────────
+        //  Seed default admin user 
         var adminSection = configuration.GetSection("DefaultAdmin");
         var adminEmail   = adminSection["Email"] ?? "admin@das.com";
         var adminPassword = adminSection["Password"] ?? "Admin@123";

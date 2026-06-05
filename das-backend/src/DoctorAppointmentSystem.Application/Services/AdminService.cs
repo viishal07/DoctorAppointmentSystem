@@ -34,14 +34,14 @@ public class AdminService : IAdminService
 
     public async Task<DashboardStatsDto> GetDashboardStatsAsync()
     {
-        var allDoctors = await _doctorRepository.GetAllApprovedAsync();
         var pendingDoctors = await _doctorRepository.GetPendingApprovalsAsync();
         var allUsers = _userManager.Users.ToList();
+        var doctors = allUsers.Where(u => u.Role == UserRole.Doctor).ToList();
         var patients = allUsers.Where(u => u.Role == UserRole.Patient).ToList();
 
         return new DashboardStatsDto
         {
-            TotalDoctors = allDoctors.Count(),
+            TotalDoctors = doctors.Count,
             PendingDoctorApprovals = pendingDoctors.Count(),
             TotalPatients = patients.Count,
             TotalAppointments = (await _appointmentRepository.GetAllAsync()).Count(),

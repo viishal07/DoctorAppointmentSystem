@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorAppointmentSystem.API.Controllers;
 
-/// <summary>Appointment booking and management.</summary>
+/// Appointment booking and management.
 [Authorize]
 public class AppointmentsController : BaseApiController
 {
@@ -16,7 +16,7 @@ public class AppointmentsController : BaseApiController
         _appointmentService = appointmentService;
     }
 
-    /// <summary>Book a new appointment (Patient only).</summary>
+    /// Book a new appointment (Patient only)
     [HttpPost]
     [Authorize(Roles = "Patient")]
     [ProducesResponseType(typeof(AppointmentResponseDto), StatusCodes.Status201Created)]
@@ -27,7 +27,7 @@ public class AppointmentsController : BaseApiController
         return Created(result, "Appointment booked successfully.");
     }
 
-    /// <summary>Get a specific appointment by ID.</summary>
+    /// Get a specific appointment by ID.
     [HttpGet("{id:guid}")]
     [Authorize(Roles = "Doctor,Patient,Admin")]
     [ProducesResponseType(typeof(AppointmentResponseDto), StatusCodes.Status200OK)]
@@ -38,7 +38,7 @@ public class AppointmentsController : BaseApiController
         return Success(result);
     }
 
-    /// <summary>Get all appointments for the authenticated doctor.</summary>
+    /// Get all appointments for the authenticated doctor
     [HttpGet("doctor")]
     [Authorize(Roles = "Doctor")]
     [ProducesResponseType(typeof(IEnumerable<AppointmentSummaryDto>), StatusCodes.Status200OK)]
@@ -48,7 +48,7 @@ public class AppointmentsController : BaseApiController
         return Success(result);
     }
 
-    /// <summary>Get all appointments for the authenticated patient.</summary>
+    /// Get all appointments for the authenticated patient.
     [HttpGet("patient")]
     [Authorize(Roles = "Patient")]
     [ProducesResponseType(typeof(IEnumerable<AppointmentSummaryDto>), StatusCodes.Status200OK)]
@@ -58,7 +58,7 @@ public class AppointmentsController : BaseApiController
         return Success(result);
     }
 
-    /// <summary>Approve a pending appointment (Doctor only).</summary>
+    ///Approve a pending appointment (Doctor only).
     [HttpPut("{id:guid}/approve")]
     [Authorize(Roles = "Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -70,7 +70,7 @@ public class AppointmentsController : BaseApiController
         return Success(message: "Appointment approved successfully.");
     }
 
-    /// <summary>Reject a pending appointment (Doctor only).</summary>
+    /// Reject a pending appointment (Doctor only)
     [HttpPut("{id:guid}/reject")]
     [Authorize(Roles = "Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -82,7 +82,7 @@ public class AppointmentsController : BaseApiController
         return Success(message: "Appointment rejected.");
     }
 
-    /// <summary>Cancel an appointment (Patient or Doctor).</summary>
+    /// Cancel an appointment (Patient or Doctor).
     [HttpPut("{id:guid}/cancel")]
     [Authorize(Roles = "Patient,Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]

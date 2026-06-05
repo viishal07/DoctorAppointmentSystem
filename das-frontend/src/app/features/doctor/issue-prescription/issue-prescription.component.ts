@@ -99,9 +99,14 @@ export class IssuePrescriptionComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    this.loadRecent();
     this.apptService.getDoctorAppointments().subscribe(all => {
       this.approvedAppointments.set(all.filter(a => a.status === 'Approved'));
     });
+  }
+
+  private loadRecent(): void {
+    this.prescriptionService.getDoctorPrescriptions().subscribe(rx => this.recent.set(rx));
   }
 
   onSubmit(): void {
@@ -110,7 +115,7 @@ export class IssuePrescriptionComponent implements OnInit {
     this.prescriptionService.create(this.form.value as any).subscribe({
       next: (rx) => {
         this.snack.open('Prescription issued successfully', 'OK', { duration: 3000 });
-        this.recent.update(list => [rx, ...list]);
+        this.recent.update(list => [rx, ...list.filter(item => item.id !== rx.id)]);
         this.form.reset();
         this.saving = false;
         this.apptService.getDoctorAppointments().subscribe(all =>

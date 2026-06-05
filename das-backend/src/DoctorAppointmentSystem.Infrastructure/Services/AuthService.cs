@@ -228,19 +228,11 @@ public class AuthService : IAuthService
 
         await _otpRepository.AddAsync(otp);
 
-        //await _emailService.SendOtpEmailAsync(
-        //    user.Email!,
-        //    user.FullName,
-        //    code,
-        //    purpose.ToString());
-
-        Console.WriteLine("====================================");
-        Console.WriteLine($"OTP FOR {user.Email}");
-        Console.WriteLine($"PURPOSE : {purpose}");
-        Console.WriteLine($"OTP CODE: {code}");
-        Console.WriteLine("====================================");
-
-
+        await _emailService.SendOtpEmailAsync(
+            user.Email!,
+            user.FullName,
+            code,
+            purpose.ToString());
     }
 
     private static string GenerateOtpCode()

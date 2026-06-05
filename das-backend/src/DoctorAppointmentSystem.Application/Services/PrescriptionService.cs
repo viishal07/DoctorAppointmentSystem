@@ -68,17 +68,33 @@ public class PrescriptionService : IPrescriptionService
         return _mapper.Map<PrescriptionResponseDto>(created);
     }
 
-    public async Task<PrescriptionResponseDto> GetByIdAsync(Guid prescriptionId)
+    public async Task<PrescriptionResponseDto> GetByIdAsync(Guid prescriptionId, string currentUserId, bool isAdmin)
     {
         var prescription = await _prescriptionRepository.GetByIdAsync(prescriptionId)
             ?? throw new KeyNotFoundException("Prescription not found.");
 
+        if (!isAdmin && prescription.Doctor.AppUserId != currentUserId && prescription.Patient.AppUserId != currentUserId)
+            throw new UnauthorizedAccessException("You can only view your own prescriptions.");
+
         return _mapper.Map<PrescriptionResponseDto>(prescription);
     }
 
-    public async Task<IEnumerable<PrescriptionResponseDto>> GetByPatientIdAsync(Guid patientId)
+    public async Task<IEnumerable<PrescriptionResponseDto>> GetByPatientIdAsync(Guid patientId, string currentUserId, bool isAdmin)
     {
         var prescriptions = await _prescriptionRepository.GetByPatientIdAsync(patientId);
+
+        if (!isAdmin)
+            prescriptions = prescriptions.Where(p => p.Patient.AppUserId == currentUserId || p.Doctor.AppUserId == currentUserId);
+
+        return _mapper.Map<IEnumerable<PrescriptionResponseDto>>(prescriptions);
+    }
+
+    public async Task<IEnumerable<PrescriptionResponseDto>> GetDoctorPrescriptionsAsync(string doctorAppUserId)
+    {
+        var doctor = await _doctorRepository.GetByAppUserIdAsync(doctorAppUserId)
+            ?? throw new KeyNotFoundException("Doctor profile not found.");
+
+        var prescriptions = await _prescriptionRepository.GetByDoctorIdAsync(doctor.Id);
         return _mapper.Map<IEnumerable<PrescriptionResponseDto>>(prescriptions);
     }
 }

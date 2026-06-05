@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DoctorAppointmentSystem.API.Controllers;
 
-/// <summary>Admin-only system management.</summary>
+/// Admin-only system management
 [Authorize(Roles = "Admin")]
 public class AdminController : BaseApiController
 {
@@ -15,7 +15,7 @@ public class AdminController : BaseApiController
         _adminService = adminService;
     }
 
-    /// <summary>Get system dashboard statistics.</summary>
+    /// Get system dashboard statistics
     [HttpGet("dashboard")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Dashboard()
@@ -24,7 +24,7 @@ public class AdminController : BaseApiController
         return Success(stats);
     }
 
-    /// <summary>Get all registered users.</summary>
+    /// Get all registered users.
     [HttpGet("users")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetUsers()
@@ -33,7 +33,7 @@ public class AdminController : BaseApiController
         return Success(users);
     }
 
-    /// <summary>Toggle a user's active/inactive status.</summary>
+    /// Toggle a user's active/inactive status.
     [HttpPut("users/{userId}/toggle-status")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -43,7 +43,7 @@ public class AdminController : BaseApiController
         return Success(message: "User status updated.");
     }
 
-    /// <summary>Get all appointments in the system.</summary>
+    /// Get all appointments in the system.
     [HttpGet("appointments")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAllAppointments()
@@ -52,7 +52,7 @@ public class AdminController : BaseApiController
         return Success(appointments);
     }
 
-    /// <summary>Get doctors pending approval.</summary>
+    ///Get doctors pending approval
     [HttpGet("doctors/pending")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetPendingDoctors()
@@ -61,7 +61,7 @@ public class AdminController : BaseApiController
         return Success(doctors);
     }
 
-    /// <summary>Approve a doctor's account.</summary>
+    /// Approve a doctor's account
     [HttpPut("doctors/{doctorId:guid}/approve")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

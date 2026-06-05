@@ -24,4 +24,9 @@ export class PrescriptionService {
     return this.http.get<ApiResponse<PrescriptionResponse[]>>(`${this.base}/patient/${patientId}`)
       .pipe(map(r => r.data));
   }
+
+  getDoctorPrescriptions(): Observable<PrescriptionResponse[]> {
+    return this.http.get<ApiResponse<PrescriptionResponse[]>>(`${this.base}/doctor`)
+      .pipe(map(r => r.data));
+  }
 }

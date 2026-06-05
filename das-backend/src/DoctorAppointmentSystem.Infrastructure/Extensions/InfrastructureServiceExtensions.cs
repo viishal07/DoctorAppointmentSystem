@@ -18,14 +18,14 @@ public static class InfrastructureServiceExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // ── Database ────────────────────────────────────────────────────────
+        //  Database 
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(
                 configuration.GetConnectionString("DefaultConnection"),
                 npgsql => npgsql.MigrationsAssembly(
                     typeof(AppDbContext).Assembly.FullName)));
 
-        // ── ASP.NET Identity ────────────────────────────────────────────────
+        //  ASP.NET Identity 
         services.AddIdentity<AppUser, IdentityRole>(options =>
         {
             // Password policy
@@ -45,7 +45,7 @@ public static class InfrastructureServiceExtensions
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
-        // ── Repositories ────────────────────────────────────────────────────
+        //  Repositories 
         services.AddScoped<IDoctorRepository,       DoctorRepository>();
         services.AddScoped<IPatientRepository,      PatientRepository>();
         services.AddScoped<IAppointmentRepository,  AppointmentRepository>();
@@ -54,7 +54,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IDepartmentRepository,   DepartmentRepository>();
         services.AddScoped<IOtpRepository,          OtpRepository>();
 
-        // ── Services ────────────────────────────────────────────────────────
+        //  Services 
         services.AddScoped<IAuthService,  AuthService>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddSingleton<IJwtService, JwtService>();

@@ -34,7 +34,7 @@ public class PrescriptionsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var result = await _prescriptionService.GetByIdAsync(id);
+        var result = await _prescriptionService.GetByIdAsync(id, CurrentUserId, User.IsInRole("Admin"));
         return Success(result);
     }
 
@@ -44,7 +44,17 @@ public class PrescriptionsController : BaseApiController
     [ProducesResponseType(typeof(IEnumerable<PrescriptionResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetByPatient([FromRoute] Guid patientId)
     {
-        var result = await _prescriptionService.GetByPatientIdAsync(patientId);
+        var result = await _prescriptionService.GetByPatientIdAsync(patientId, CurrentUserId, User.IsInRole("Admin"));
+        return Success(result);
+    }
+
+    /// <summary>Get all prescriptions issued by the authenticated doctor.</summary>
+    [HttpGet("doctor")]
+    [Authorize(Roles = "Doctor")]
+    [ProducesResponseType(typeof(IEnumerable<PrescriptionResponseDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDoctorPrescriptions()
+    {
+        var result = await _prescriptionService.GetDoctorPrescriptionsAsync(CurrentUserId);
         return Success(result);
     }
 }

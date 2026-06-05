@@ -36,6 +36,12 @@ public class PrescriptionRepository : IPrescriptionRepository
             .OrderByDescending(p => p.IssuedAt)
             .ToListAsync();
 
+    public async Task<IEnumerable<Prescription>> GetByDoctorIdAsync(Guid doctorId)
+        => await WithFullIncludes()
+            .Where(p => p.DoctorId == doctorId)
+            .OrderByDescending(p => p.IssuedAt)
+            .ToListAsync();
+
     public async Task AddAsync(Prescription prescription)
     {
         await _context.Prescriptions.AddAsync(prescription);

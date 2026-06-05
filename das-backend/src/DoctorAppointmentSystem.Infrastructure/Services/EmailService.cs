@@ -20,6 +20,13 @@ public class EmailService : IEmailService
     private async Task SendAsync(string toEmail, string toName, string subject, string htmlBody)
     {
         var settings = _configuration.GetSection("EmailSettings");
+        var host = settings["Host"] ?? throw new InvalidOperationException("SMTP Host not configured.");
+        var portValue = settings["Port"] ?? "587";
+        var username = settings["Username"] ?? throw new InvalidOperationException("SMTP Username not configured.");
+        var password = settings["Password"] ?? throw new InvalidOperationException("SMTP Password not configured.");
+
+        if (!int.TryParse(portValue, out var port))
+            throw new InvalidOperationException("SMTP Port is invalid.");
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(
@@ -33,14 +40,9 @@ public class EmailService : IEmailService
 
         using var client = new SmtpClient();
 
-        await client.ConnectAsync(
-            settings["Host"] ?? throw new InvalidOperationException("SMTP Host not configured."),
-            int.Parse(settings["Port"] ?? "587"),
-            SecureSocketOptions.StartTls);
+        await client.ConnectAsync(host, port, SecureSocketOptions.StartTls);
 
-        await client.AuthenticateAsync(
-            settings["Username"] ?? throw new InvalidOperationException("SMTP Username not configured."),
-            settings["Password"] ?? throw new InvalidOperationException("SMTP Password not configured."));
+        await client.AuthenticateAsync(username, password);
 
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
