@@ -36,7 +36,9 @@ public class AppointmentConfiguration : IEntityTypeConfiguration<Appointment>
             .HasForeignKey(a => a.PatientId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(a => new { a.DoctorId, a.ScheduledAt });
+        builder.HasIndex(a => new { a.DoctorId, a.ScheduledAt })
+            .IsUnique()
+            .HasFilter("\"Status\" IN ('Pending', 'Approved')");
         builder.HasIndex(a => a.PatientId);
     }
 }

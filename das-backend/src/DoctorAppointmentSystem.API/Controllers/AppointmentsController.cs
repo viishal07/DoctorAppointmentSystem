@@ -34,7 +34,7 @@ public class AppointmentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
-        var result = await _appointmentService.GetByIdAsync(id);
+        var result = await _appointmentService.GetByIdAsync(id, CurrentUserId, User.IsInRole("Admin"));
         return Success(result);
     }
 
@@ -66,7 +66,7 @@ public class AppointmentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Approve([FromRoute] Guid id, [FromBody] UpdateAppointmentStatusDto dto)
     {
-        await _appointmentService.ApproveAppointmentAsync(id, dto);
+        await _appointmentService.ApproveAppointmentAsync(id, CurrentUserId, dto);
         return Success(message: "Appointment approved successfully.");
     }
 
@@ -78,7 +78,7 @@ public class AppointmentsController : BaseApiController
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Reject([FromRoute] Guid id, [FromBody] UpdateAppointmentStatusDto dto)
     {
-        await _appointmentService.RejectAppointmentAsync(id, dto);
+        await _appointmentService.RejectAppointmentAsync(id, CurrentUserId, dto);
         return Success(message: "Appointment rejected.");
     }
 

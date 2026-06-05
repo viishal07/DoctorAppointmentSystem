@@ -123,6 +123,18 @@ public class AuthService : IAuthService
         if (!user.IsActive)
             throw new UnauthorizedAccessException("Your account has been deactivated. Please contact support.");
 
+        if (!user.EmailConfirmed)
+            throw new UnauthorizedAccessException("Please verify your email before logging in.");
+
+        if (user.Role == UserRole.Doctor)
+        {
+            var doctor = await _doctorRepository.GetByAppUserIdAsync(user.Id)
+                ?? throw new KeyNotFoundException("Doctor profile not found.");
+
+            if (!doctor.IsApproved)
+                throw new UnauthorizedAccessException("Your doctor account is pending admin approval.");
+        }
+
         var validPassword = await _userManager.CheckPasswordAsync(user, dto.Password);
         if (!validPassword)
             throw new UnauthorizedAccessException("Invalid email or password.");

@@ -55,6 +55,12 @@ public class AppointmentRepository : IAppointmentRepository
     public async Task<int> CountByStatusAsync(AppointmentStatus status)
         => await _context.Appointments.CountAsync(a => a.Status == status);
 
+    public async Task<bool> HasActiveSlotAsync(Guid doctorId, DateTime scheduledAt)
+        => await _context.Appointments.AnyAsync(a =>
+            a.DoctorId == doctorId &&
+            a.ScheduledAt == scheduledAt &&
+            (a.Status == AppointmentStatus.Pending || a.Status == AppointmentStatus.Approved));
+
     public async Task AddAsync(Appointment appointment)
     {
         await _context.Appointments.AddAsync(appointment);

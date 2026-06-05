@@ -37,15 +37,12 @@ export class AuthStore {
   //  this.redirectByRole(response.role);
     //}
 
-    login(response: LoginResponse): void {
-        console.log('ROLE:', response.role);
-
-        localStorage.setItem(environment.tokenKey, response.token);
-        localStorage.setItem(environment.userKey, JSON.stringify(response));
-        this._currentUser.set(response);
-
-        this.router.navigate(['/doctor/dashboard']);
-    }
+  login(response: LoginResponse): void {
+    localStorage.setItem(environment.tokenKey, response.token);
+    localStorage.setItem(environment.userKey, JSON.stringify(response));
+    this._currentUser.set(response);
+    this.redirectByRole(response.role);
+  }
 
   logout(): void {
     this.clearStorage();

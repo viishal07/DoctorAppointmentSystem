@@ -10,6 +10,7 @@ public interface IAppointmentRepository
     Task<IEnumerable<Appointment>> GetAllAsync();
     Task<int> CountTodayAsync();
     Task<int> CountByStatusAsync(Domain.Enums.AppointmentStatus status);
+    Task<bool> HasActiveSlotAsync(Guid doctorId, DateTime scheduledAt);
     Task AddAsync(Appointment appointment);
     Task UpdateAsync(Appointment appointment);
 }
