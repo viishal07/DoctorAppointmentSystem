@@ -4,7 +4,7 @@ using DoctorAppointmentSystem.Infrastructure.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── Services ─────────────────────────────────────────────────────────────────
+//  Services 
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -24,14 +24,14 @@ builder.Services.AddCorsPolicy();
 // Swagger with JWT support
 builder.Services.AddSwaggerWithJwt();
 
-// ── Build ─────────────────────────────────────────────────────────────────────
+//  Build 
 
 var app = builder.Build();
 
-// ── Database migrations + seeding ─────────────────────────────────────────────
+//  Database migrations + seeding 
 await app.Services.ApplyMigrationsAndSeedAsync();
 
-// ── Middleware pipeline ───────────────────────────────────────────────────────
+//  Middleware pipeline 
 
 // 1. Global exception handler — must be first to catch all downstream errors
 app.UseMiddleware<ExceptionHandlingMiddleware>();
