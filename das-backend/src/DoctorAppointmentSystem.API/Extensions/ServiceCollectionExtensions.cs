@@ -95,7 +95,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddCors(options =>
         {
-            options.AddPolicy("AllowAll", policy =>
+            options.AddPolicy("AllowFrontend", policy =>
                 policy
                     .AllowAnyOrigin()
                     .AllowAnyMethod()

@@ -51,7 +51,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // 4. CORS — must be before Auth
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 // 5. Authentication → Authorization (order matters)
 app.UseAuthentication();
